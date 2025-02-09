@@ -18,22 +18,11 @@ const BookingDetails = () => {
   const [contactNumber, setContactNumber] = useState('');
   const [userAddress, setUserAddress] = useState('');
   const [appointmentType, setAppointmentType] = useState('Clinic Appointment');
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showServicesDropdown, setShowServicesDropdown] = useState(false);
   const [selectedServices, setSelectedServices] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedTime, setSelectedTime] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
-  const [selectedDoctor, setSelectedDoctor] = useState(null);
-  const [showDoctorDropdown, setShowDoctorDropdown] = useState(false);
-
-  const doctors = [
-    { id: 1, name: 'Dr. Smith' },
-    { id: 2, name: 'Dr. Johnson' },
-    { id: 3, name: 'Dr. Lee' }
-  ];
-  
 
   const appointmentOptions = ['Clinic Appointment', 'House Call Service'];
   const consultationServices = [
@@ -45,14 +34,8 @@ const BookingDetails = () => {
   ];
 
   const handleConfirmBooking = () => {
-    if (!fullName || !contactNumber || selectedServices.length === 0) {
+    if (!fullName || !contactNumber || !userAddress || selectedServices.length === 0) {
       alert('Please fill in all details.');
-      return;
-    }
-  
-    // Only validate userAddress if appointmentType is "House Call Service"
-    if (appointmentType === "House Call Service" && !userAddress.trim()) {
-      alert('Please enter your address for House Call Service.');
       return;
     }
   
@@ -61,13 +44,12 @@ const BookingDetails = () => {
       contactNumber,
       appointmentType,
       selectedDate,
-      userAddress: appointmentType === "Clinic Appointment" ? "N/A" : userAddress, // Ignore address if clinic
+      userAddress,
       selectedService: selectedServices[0], // Assuming single selection as per earlier requirement
     };
   
     navigation.navigate('complete', { bookingDetails });
   };
-  
   
 
   const handleDateChange = (event, date) => {
@@ -113,61 +95,54 @@ const BookingDetails = () => {
               onChangeText={setContactNumber}
             />
           </View>
-                    
-{/* Appointment Type */}
-<View style={styles.inputContainer}>
-  <Text style={styles.label}>Appointment Type</Text>
-  <TouchableOpacity
-    style={styles.dropdownButton}
-    onPress={() => setShowDropdown(true)}
-  >
-    <Text style={styles.dropdownButtonText}>{appointmentType}</Text>
-  </TouchableOpacity>
-  {showDropdown && (
-    <Modal transparent={true} animationType="fade">
-      <TouchableOpacity
-        style={styles.modalOverlay}
-        onPress={() => setShowDropdown(false)}
-      >
-        <View style={styles.dropdownContainer}>
-          <FlatList
-            data={appointmentOptions}
-            keyExtractor={(item) => item}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.dropdownItem}
-                onPress={() => {
-                  setAppointmentType(item);
-                  setShowDropdown(false);
-                }}
-              >
-                <Text style={styles.dropdownItemText}>{item}</Text>
-              </TouchableOpacity>
+
+          {/* Address */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Address</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your address"
+              value={userAddress}
+              onChangeText={setUserAddress}
+            />
+          </View>
+
+          {/* Appointment Type */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Appointment Type</Text>
+            <TouchableOpacity
+              style={styles.dropdownButton}
+              onPress={() => setShowDropdown(true)}
+            >
+              <Text style={styles.dropdownButtonText}>{appointmentType}</Text>
+            </TouchableOpacity>
+            {showDropdown && (
+              <Modal transparent={true} animationType="fade">
+                <TouchableOpacity
+                  style={styles.modalOverlay}
+                  onPress={() => setShowDropdown(false)}
+                >
+                  <View style={styles.dropdownContainer}>
+                    <FlatList
+                      data={appointmentOptions}
+                      keyExtractor={(item) => item}
+                      renderItem={({ item }) => (
+                        <TouchableOpacity
+                          style={styles.dropdownItem}
+                          onPress={() => {
+                            setAppointmentType(item);
+                            setShowDropdown(false);
+                          }}
+                        >
+                          <Text style={styles.dropdownItemText}>{item}</Text>
+                        </TouchableOpacity>
+                      )}
+                    />
+                  </View>
+                </TouchableOpacity>
+              </Modal>
             )}
-          />
-        </View>
-      </TouchableOpacity>
-    </Modal>
-  )}
-</View>
-
-{/* Address (Only Editable for House Call Services) */}
-<View style={styles.inputContainer}>
-  <Text style={styles.label}>Address</Text>
-  <TextInput
-    style={[
-      styles.input,
-      {
-        backgroundColor: appointmentType === "House Call Service" ? "#fff" : "#e0e0e0", // Disabled color
-      },
-    ]}
-    placeholder="Enter your address"
-    value={userAddress}
-    onChangeText={setUserAddress}
-    editable={appointmentType === "House Call Service"} // Enable input only for House Call
-  />
-</View>
-
+          </View>
 
 {/* Consultation Services */}
 <View style={styles.inputContainer}>
@@ -213,85 +188,27 @@ const BookingDetails = () => {
   )}
 </View>
 
-{/* Doctor Selection */}
-<View style={styles.inputContainer}>
-  <Text style={styles.label}>Select Doctor</Text>
-  <TouchableOpacity
-    style={styles.dropdownButton}
-    onPress={() => setShowDoctorDropdown(true)}
-  >
-    <Text style={styles.dropdownButtonText}>
-      {selectedDoctor ? selectedDoctor.name : 'Select a Doctor'}
-    </Text>
-  </TouchableOpacity>
-  {showDoctorDropdown && (
-    <Modal transparent={true} animationType="fade">
-      <TouchableOpacity
-        style={styles.modalOverlay}
-        onPress={() => setShowDoctorDropdown(false)}
-      >
-        <View style={styles.dropdownContainer}>
-          <FlatList
-            data={doctors}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={[
-                  styles.dropdownItem,
-                  selectedDoctor?.id === item.id && styles.selectedItem,
-                ]}
-                onPress={() => {
-                  setSelectedDoctor(item);
-                  setShowDoctorDropdown(false);
-                }}
-              >
-                <Text style={styles.dropdownItemText}>{item.name}</Text>
-              </TouchableOpacity>
-            )}
-          />
-        </View>
-      </TouchableOpacity>
-    </Modal>
-  )}
-</View>
-
-
 
           {/* Date and Time */}
           <View style={styles.inputContainer}>
-        <Text style={styles.label}>Appointment Date</Text>
-        <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dropdownButton}>
-          <Text style={styles.dropdownButtonText}>{selectedDate.toDateString()}</Text>
-        </TouchableOpacity>
-        {showDatePicker && (
-          <DateTimePicker
-            value={selectedDate}
-            mode="date"
-            display="default"
-            onChange={(event, date) => {
-              if (date) setSelectedDate(date);
-              setShowDatePicker(false);
-            }}
-          />
-        )}
-      </View>
-           <View style={styles.inputContainer}>
-        <Text style={styles.label}>Appointment Time</Text>
-        <TouchableOpacity onPress={() => setShowTimePicker(true)} style={styles.dropdownButton}>
-        <Text style={styles.dropdownButtonText}>{selectedTime.toLocaleTimeString()}</Text>
-        </TouchableOpacity>
-        {showTimePicker && (
-          <DateTimePicker
-            value={selectedTime}
-            mode="time"
-            display="default"
-            onChange={(event, time) => {
-              if (time) setSelectedTime(time);
-              setShowTimePicker(false);
-            }}
-          />
-        )}
-      </View>
+            <Text style={styles.label}>Appointment Date & Time</Text>
+            <TouchableOpacity
+              style={styles.datePickerButton}
+              onPress={() => setShowDatePicker(true)}
+            >
+              <Text style={styles.datePickerText}>
+                {selectedDate.toLocaleString()}
+              </Text>
+            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                value={selectedDate}
+                mode="datetime"
+                display="default"
+                onChange={handleDateChange}
+              />
+            )}
+          </View>
 
           {/* Confirm Booking */}
           <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmBooking}>
@@ -380,8 +297,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
-    padding: 12,
+    padding: 10,
     backgroundColor: '#fff',
+    marginBottom: 10,
   },
   datePickerText: {
     fontSize: 16,

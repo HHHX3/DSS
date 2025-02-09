@@ -1,10 +1,16 @@
-import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity } from 'react-native';
-import React from 'react';
+import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Modal } from 'react-native';
+import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 
 
 const clinic1 = () => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const navigation = useNavigation();
+  const booknavi = ()=>{
+    setIsModalVisible(false);
+    navigation.navigate('booking');
+  };
+
   const clinicDetails = {
     address: '123 Main Street, City, State, 12345',
     operationalHours: 'Monday - Friday: 8 AM - 6 PM\nSaturday: 9 AM - 2 PM\nSunday: Closed',
@@ -83,10 +89,26 @@ const clinic1 = () => {
         >
           <Text style={styles.tabText}>Back</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.tabItem}
-          onPress={() => navigation.navigate('booking')}>
+        <TouchableOpacity onPress={() => setIsModalVisible(true)} style={styles.tabItem}>
           <Text style={styles.tabText}>Book</Text>
         </TouchableOpacity>
+
+      <Modal visible={isModalVisible} transparent={true} animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalheading}>Appointment Booking</Text>
+            <Text style={[styles.text, {textAlign: 'center', marginBottom: 30}]}>Do you want to have a appoinment in KMC Meidical Center Ipoh ?</Text>
+            <View style={[{flexDirection: 'row'}]}>
+              <TouchableOpacity onPress={() => setIsModalVisible(false)} style={styles.tabItem}>
+              <Text style={[styles.tabTextmodal]}>Close</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => booknavi()} style={styles.tabItem}>
+            <Text style={[styles.tabTextmodal]}>Confirm</Text>
+            </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
       </View>
     </>
   );
@@ -146,7 +168,7 @@ const styles = StyleSheet.create({
   },
   tabText: {
     borderColor: '#ff0000',
-    padding: 20,
+    paddingVertical: 15,
     paddingHorizontal: 40,
     backgroundColor: '#f9ebea',
     fontSize: 20,
@@ -155,4 +177,40 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     borderWidth: 1,
   },
+  tabTextmodal: {
+    borderColor: '#ff0000',
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    backgroundColor: '#f9ebea',
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ac7270',
+    borderRadius: 30,
+    borderWidth: 1,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    height: '30%',
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 30,
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  modalheading:{
+    padding: 20,
+    paddingHorizontal: 30,
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#ac7270',
+  }
 });

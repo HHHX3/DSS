@@ -84,7 +84,7 @@ const HomeScreen = () => {
   return (
     <>
       <View style={[{ flex: 4 }]}>
-        <MapView style={styles.map} region={currentRegion}>
+        <MapView style={styles.map} region={currentRegion} >
           <Marker
             coordinate={{
               latitude: 4.582733613446774,
@@ -111,6 +111,7 @@ const HomeScreen = () => {
           <TextInput
             style={styles.searchBar}
             placeholder="Search locations..."
+            placeholderTextColor="#ac7270" // Change this to your preferred color
             value={searchText}
             onChangeText={(text) => setSearchText(text)}
           />
@@ -219,7 +220,8 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   locationText: {
-    fontSize: 18,
+    fontWeight: 'bold',
+    fontSize: 15,
     color: '#333',
   },
   proceedButton: {

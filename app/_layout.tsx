@@ -43,6 +43,10 @@ export default function RootLayout() {
         <Stack.Screen name="profile" options={{ headerShown: false }} />
         <Stack.Screen name="booking" options={{ headerShown: false }} />
         <Stack.Screen name="complete" options={{ headerShown: false }} />
+        <Stack.Screen name="fakecall" options={{ headerShown: false }} />
+        <Stack.Screen name="register" options={{ headerShown: false }} />
+
+
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

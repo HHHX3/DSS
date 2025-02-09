@@ -1,51 +1,77 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, View, TouchableOpacity, Image} from 'react-native';
+import { StyleSheet, Text, TextInput, View, TouchableOpacity, Image, Animated, PanResponder, Dimensions, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import LottieView from 'lottie-react-native';
 import loginanimation from '../assets/images/loginanimation.json';
 
-const LoginScreen = () => {
-  const navigation = useNavigation();
+const { width } = Dimensions.get('window');
 
-  const handleLogin = () => {
-    navigation.navigate('homepage');
-  };
+const LoginScreen = () => {
+  const [idNumber, setIdNumber] = useState('');
+  const navigation = useNavigation();
+  const loginnavi = () => {
+    if (!/^\d{12}$/.test(idNumber)) {
+          Alert.alert('Invalid Identification Number', 'Identification number must be exactly 12 digits.');
+          return;
+        }
+  }
+  const translateX = new Animated.Value(0);
+  const panResponder = PanResponder.create({
+    onMoveShouldSetPanResponder: () => true,
+    onPanResponderMove: Animated.event([
+      null,
+      { dx: translateX }
+    ], { useNativeDriver: false }),
+    onPanResponderRelease: (_, gesture) => {
+      if (gesture.dx > width * 0.5) {
+        navigation.navigate('fakecall')
+      }
+      Animated.timing(translateX, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: false,
+      }).start();
+    },
+  });
 
   return (
-    <View style={[styles.container,]}>
-    <View style= {[{flex : 1, width: '100%',backgroundColor: '#ac7270', alignItems: 'flex-end'}]}>
-    </View>
-    <View style= {[{flex : 8, alignItems: 'center'}]}>
-    <LottieView
-          source={loginanimation}
-          autoPlay
-          loop
-          style={styles.animation}
-        />
-      <Text style={styles.title}>iCare</Text>
-      <View>
-     <Text>Username</Text> 
-      <TextInput
-        style={styles.input}
-        placeholder="Username"
-
-      />
-      <Text>Password</Text> 
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-      />
+    <View style={styles.container}>
+      <View style={styles.topBackground} />
+      <View style={styles.curve}><Text></Text></View>
+      
+      {/* Slide to Call Button */}
+      <View style={styles.sliderContainer}>     
+        <View style={styles.sliderBar}>
+        <Text style={styles.sliderText}>Slide for Emergency Call</Text>
+          <Animated.View
+            {...panResponder.panHandlers}
+            style={[styles.sliderThumb, { transform: [{ translateX }] }]}
+          >
+        <Image style={styles.image} source={require('../assets/images/presssos.png')} />          
+        </Animated.View>
+        </View>
       </View>
-
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
-    </View>
-    <View style={[styles.tabBar,{flex:1}]}>
-        <TouchableOpacity style={styles.tabItem}>
-        <Image style={[styles.image,]} source={require('../assets/images/sos.png')} />
-          <Text style={styles.tabText}>Emergency Call</Text>
+      
+      <View style={styles.mainContent}>
+        <LottieView source={loginanimation} autoPlay loop style={styles.animation} />
+        <Text style={styles.title}>MEDBOOK</Text>
+        <View>
+          <Text style={[{fontWeight: 'bold'}]}>Identification Number</Text>
+          <TextInput style={styles.input} 
+          placeholder="eg.900101081234" 
+          placeholderTextColor="#ac7270" // Change this to your preferred color
+          keyboardType="numeric" 
+          value={idNumber} 
+          onChangeText={setIdNumber}
+          />
+        </View>
+        <TouchableOpacity onPress={() => navigation.navigate('homepage')} style={styles.button}>
+          <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
+        <View style={styles.registerContainer}>
+          <Text style={styles.Ytext}>Your first time?</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('register')}><Text style={styles.Rtext}>Register</Text></TouchableOpacity>          
+        </View>
       </View>
     </View>
   );
@@ -58,10 +84,63 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  topBackground: {
+    flex: 1.5,
+    width: '100%',
+    backgroundColor: '#ac7270',
+  },
+  curve: {
+    top: -15,
+    width: '100%',
+    backgroundColor: 'white',
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
+  },
+  sliderContainer: {
+    borderRadius: 25,
+    width : '80%',
+    alignItems: 'center',
+  },
+  sliderText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    paddingLeft: 40,
+    color: '#ac7270'
+  },
+  sliderBar: {
+    width: width * 0.8,
+    height: 50,
+    backgroundColor: '#f9ebea',
+    borderRadius: 25,
+    justifyContent: 'center',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  sliderThumb: {
+    width: 50,
+    height: 50,
+    backgroundColor: '#b80000',
+    borderRadius: 25,
+    position: 'absolute',
+    left: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  arrow: {
+    fontSize: 20,
+    color: 'white',
+  },
+  mainContent: {
+    flex: 9,
+    alignItems: 'center',
+    marginTop: 30,
+  },
   title: {
+    color: '#ac7270',
     fontSize: 34,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 30,
   },
   input: {
     borderWidth: 1,
@@ -70,47 +149,49 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 15,
     marginTop: 5,
-
-    width: 350,
+    width: 300,
   },
   button: {
     backgroundColor: '#f9ebea',
     padding: 15,
-    borderRadius: 5,
+    borderRadius: 10,
     alignItems: 'center',
     width: 200,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   buttonText: {
     color: 'black',
     fontWeight: 'bold',
   },
-  animation: {
-    marginTop: 40,
-    width: 400,
-    height: 300,
-    marginBottom: 20,
+  registerContainer: {
+    flexDirection: 'row',
+    paddingTop: 20,
+    alignItems: 'baseline',
+  },
+  Rtext: {
+    paddingLeft: 20,
+    fontWeight: 'bold',
+    fontStyle: 'italic',
+    fontSize: 20,
+    color: 'black',
+    textDecorationLine: 'underline',
+  },
+  Ytext: {
+    color: 'blue',
   },
   image: {
-    width: 45,
-    height : 45,
+    width: 40,
+    height: 40,
+    borderRadius: 50,
   },
-  tabBar: {
-    width: '100%',
-    flexDirection: 'row',
-    borderRadius: 30,
-    backgroundColor: '#f9ebea',
-    borderWidth: 1,
-    borderColor: '#ff0000',
-  },
-  tabItem: {
-    flexDirection: 'row',
-    flex: 1,
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-  },
-  tabText: {
-    fontSize: 20,
-    color: 'red',
+  animation: {
+    width: 350,
+    height: 250,
+    marginBottom: 10,
   },
 });
 
