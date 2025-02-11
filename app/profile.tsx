@@ -3,7 +3,6 @@ import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, TextInput,
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import BookingDetails from './booking';
 
 
 const ProfileScreen = () => {
@@ -61,7 +60,6 @@ const ProfileScreen = () => {
           setSelectSer(book.selectedService)
           setSelectDate(book.selectedDate)
           setSelectTime(book.selectedTime)
-          console.log(book)
         }
       } catch (error) {
         console.error('Error loading user details:', error);
@@ -74,6 +72,8 @@ const ProfileScreen = () => {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const [statemodalVisible, setStateModalVisible] = useState(false);
+  const [bookmodalVisible, setBookModalVisible] = useState(false);
+
 
   const saveDetails = async () => {
     try {
@@ -126,7 +126,7 @@ const ProfileScreen = () => {
       <View style={[{flex: 7}]}>      
         {/* Medical Reports Section */}
       <ScrollView contentContainerStyle={styles.reportsContainer}>
-            <TouchableOpacity style={[styles.reportCard]} onPress={() => navigation.navigate('report1')}>
+            <TouchableOpacity style={[styles.BookCard]}  onPress={() => setBookModalVisible(true)}>
             <Text style={styles.bookTitle}>Booking History</Text>
             </TouchableOpacity>
       <Text style={styles.reportsHeader}>Medical Reports</Text>
@@ -226,6 +226,48 @@ const ProfileScreen = () => {
           </View>
         </View>
       </Modal>
+
+      <Modal
+      animationType="slide"
+      transparent={true}
+      visible={bookmodalVisible}>
+      <View style={styles.modalContainer}>
+        <View style={styles.modalContent}>
+          <Text style={styles.title}>Booking History</Text>
+
+            <View>
+              <Text style={styles.label}>Full Name:</Text>
+              <Text style={styles.value}>{fullname}</Text>
+
+              <Text style={styles.label}>Contact Number:</Text>
+              <Text style={styles.value}>{contactnum}</Text>
+
+              <Text style={styles.label}>Appointment Type:</Text>
+              <Text style={styles.value}>{appointmenttype}</Text>
+
+              <Text style={styles.label}>Address:</Text>
+              <Text style={styles.value}>{userAddress}</Text>
+
+              <Text style={styles.label}>Doctor:</Text>
+              <Text style={styles.value}>{selectdoc}</Text>
+
+              <Text style={styles.label}>Service:</Text>
+              <Text style={styles.value}>{selectSer}</Text>
+
+              <Text style={styles.label}>Date:</Text>
+              <Text style={styles.value}>{selectdate}</Text>
+
+              <Text style={styles.label}>Time:</Text>
+              <Text style={styles.value}>{selecttime}</Text>
+            </View>
+
+          <TouchableOpacity style={styles.closeButton} onPress={() => setBookModalVisible(false)}>
+            <Text style={styles.closeButtonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+    
     </View>
   );
 };
@@ -285,6 +327,16 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 3,
   },
+  BookCard: {
+    backgroundColor: '#ac7270',
+    padding: 15,
+    marginBottom: 10,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
   reportTitle: {
     fontSize: 16,
     fontWeight: 'bold',
@@ -296,6 +348,7 @@ const styles = StyleSheet.create({
     paddingBottom: 5,
     paddingTop: 5,
     textAlign: 'center',
+    color: '#fff'
   },
   reportDate: {
     fontSize: 14,
@@ -389,6 +442,37 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     alignItems: 'center',
   },
-  
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#ac7270',
+    marginBottom: 15,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'black',
+    marginTop: 8,
+  },
+  value: {
+    fontSize: 16,
+    color: 'black',
+  },
+  noData: {
+    fontSize: 16,
+    fontStyle: 'italic',
+    color: 'gray',
+  },
+  closeButton: {
+    marginTop: 20,
+    backgroundColor: '#ac7270',
+    paddingVertical: 10,
+    paddingHorizontal: 25,
+    borderRadius: 10,
+  },
+  closeButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
 
 });
