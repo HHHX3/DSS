@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BookingDetails = () => {
   const navigation = useNavigation();
@@ -34,6 +35,21 @@ const BookingDetails = () => {
     { id: 3, name: 'Dr. Lee' }
   ];
   
+  useEffect(() => {
+    const loadUserDetails = async () => {
+      const savedDetails = await AsyncStorage.getItem('userDetails');
+      if (savedDetails) {
+        const { name, phone, address } = JSON.parse(savedDetails);
+        setFullName(name);
+        setContactNumber(phone);
+        setUserAddress(address);
+        console.log(name, phone, address);
+      }
+    };
+
+    loadUserDetails();
+  }, []);
+  
 
   const appointmentOptions = ['Clinic Appointment', 'House Call Service'];
   const consultationServices = [
@@ -55,26 +71,27 @@ const BookingDetails = () => {
       alert('Please enter your address for House Call Service.');
       return;
     }
+    if (!selectedDoctor) {
+        alert('Please select a doctor.');
+        return;
+    }  
+
+    const formattedDate = selectedDate.toDateString(); // Example: "Sun Feb 11 2025"
+    const formattedTime = selectedTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }); // Example: "10:30 AM"
+  
   
     const bookingDetails = {
       fullName,
       contactNumber,
       appointmentType,
-      selectedDate,
       userAddress: appointmentType === "Clinic Appointment" ? "N/A" : userAddress, // Ignore address if clinic
+      selectedDoctor : selectedDoctor.name,
       selectedService: selectedServices[0], // Assuming single selection as per earlier requirement
+      selectedDate: formattedDate,
+      selectedTime: formattedTime,
     };
-  
-    navigation.navigate('complete', { bookingDetails });
-  };
-  
-  
 
-  const handleDateChange = (event, date) => {
-    setShowDatePicker(false);
-    if (date) {
-      setSelectedDate(date);
-    }
+    navigation.navigate('complete', { bookingDetails });
   };
 
   const handleServiceSelection = (service) => {
@@ -278,7 +295,9 @@ const BookingDetails = () => {
            <View style={styles.inputContainer}>
         <Text style={styles.label}>Appointment Time</Text>
         <TouchableOpacity onPress={() => setShowTimePicker(true)} style={styles.dropdownButton}>
-        <Text style={styles.dropdownButtonText}>{selectedTime.toLocaleTimeString()}</Text>
+        <Text style={styles.dropdownButtonText}>
+          {selectedTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+        </Text>
         </TouchableOpacity>
         {showTimePicker && (
           <DateTimePicker

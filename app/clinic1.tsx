@@ -98,9 +98,9 @@ const clinic1 = () => {
           <View style={styles.modalContent}>
             <Text style={styles.modalheading}>Appointment Booking</Text>
             <Text style={[styles.text, {textAlign: 'center', marginBottom: 30}]}>Do you want to have a appoinment in KMC Meidical Center Ipoh ?</Text>
-            <View style={[{flexDirection: 'row'}]}>
+            <View style={[{flexDirection: 'row', alignContent: 'space-around'}]}>
               <TouchableOpacity onPress={() => setIsModalVisible(false)} style={styles.tabItem}>
-              <Text style={[styles.tabTextmodal]}>Close</Text>
+              <Text style={[styles.tabTextmodal]}> Close </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => booknavi()} style={styles.tabItem}>
             <Text style={[styles.tabTextmodal]}>Confirm</Text>

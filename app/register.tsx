@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, FlatList, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const states = [
   'Johor', 'Kedah', 'Kelantan', 'Melaka', 'Negeri Sembilan', 'Pahang', 'Perak', 'Perlis', 'Pulau Pinang', 'Sabah', 'Sarawak', 'Selangor', 'Terengganu', 'Wilayah Persekutuan'
@@ -18,7 +19,7 @@ const RegisterScreen = () => {
   const [address, setAddress] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (!name) {
       Alert.alert('Full Name Required', 'Please enter your name.');
       return;
@@ -27,42 +28,60 @@ const RegisterScreen = () => {
       Alert.alert('Invalid Email', 'Please enter a valid email address with @ symbol.');
       return;
     }
-    
-    if (!/^\d{9,10}$/.test(phone)) {
+    if (!/^\d{10,11}$/.test(phone)) {
       Alert.alert('Invalid Phone Number', 'Phone number must be 9 or 10 digits.');
       return;
     }
-
     if (!/^\d{12}$/.test(idNumber)) {
       Alert.alert('Invalid Identification Number', 'Identification number must be exactly 12 digits.');
       return;
     }
-
-    if (!/^\d{6}$/.test(posCode)) {
+    if (!/^\d{5}$/.test(posCode)) {
       Alert.alert('Invalid Pos Code', 'Pos code must be exactly 6 digits.');
       return;
     }
-
     if (!state) {
       Alert.alert('State Required', 'Please select a state.');
       return;
     }
-
     if (!address) {
       Alert.alert('Street Address Required', 'Please enter your address.');
       return;
     }
-
-    // If all validations pass, navigate to login
-    Alert.alert('Success', 'Registration successful!');
-    navigation.navigate('index');
+  
+    const userData = {
+      name,
+      email,
+      phone,
+      idNumber,
+      posCode,
+      city,
+      state,
+      address,
+    };
+  
+    try {
+      await AsyncStorage.setItem('userDetails', JSON.stringify(userData));
+      Alert.alert('Success', 'Registration successful!');
+      console.log(userData);
+      navigation.navigate('index'); // Navigate after saving
+    } catch (error) {
+      Alert.alert('Error', 'Failed to save data. Please try again.');
+      console.error('AsyncStorage Error:', error);
+    }
   };
-
+  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Register</Text>
       
-      <TextInput style={styles.input} placeholder="Full Name"  value={name} onChangeText={setName} />
+      <TextInput 
+      style={styles.input} 
+      placeholder="Full Name"  
+      placeholderTextColor="#ac7270" // Change this to your preferred color
+      value={name} 
+      onChangeText={setName}
+      />
       <TextInput style={styles.input} 
       placeholder="Email" 
       placeholderTextColor="#ac7270" // Change this to your preferred color

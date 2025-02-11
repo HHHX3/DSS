@@ -3,6 +3,8 @@ import { StyleSheet, Text, TextInput, View, TouchableOpacity, Image, Animated, P
 import { useNavigation } from '@react-navigation/native';
 import LottieView from 'lottie-react-native';
 import loginanimation from '../assets/images/loginanimation.json';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const { width } = Dimensions.get('window');
 
@@ -10,11 +12,26 @@ const LoginScreen = () => {
   const [idNumber, setIdNumber] = useState('');
   const navigation = useNavigation();
   const loginnavi = () => {
-    if (!/^\d{12}$/.test(idNumber)) {
-          Alert.alert('Invalid Identification Number', 'Identification number must be exactly 12 digits.');
-          return;
-        }
+    // if (!/^\d{12}$/.test(idNumber)) {
+    //       Alert.alert('Invalid Identification Number', 'Identification number must be exactly 12 digits.');
+    //       return;
+    //     } else {
+          navigation.navigate('homepage')
+        // }
   }
+
+  const getUserData = async () => {
+    try {
+      const storedData = await AsyncStorage.getItem('userDetails');
+      if (storedData !== null) {
+        const userData = JSON.parse(storedData);
+        console.log('User Data:', userData);
+      }
+    } catch (error) {
+      console.error('Error retrieving user data:', error);
+    }
+  };
+  
   const translateX = new Animated.Value(0);
   const panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: () => true,
@@ -65,7 +82,7 @@ const LoginScreen = () => {
           onChangeText={setIdNumber}
           />
         </View>
-        <TouchableOpacity onPress={() => navigation.navigate('homepage')} style={styles.button}>
+        <TouchableOpacity onPress={() => loginnavi()} style={styles.button}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
         <View style={styles.registerContainer}>

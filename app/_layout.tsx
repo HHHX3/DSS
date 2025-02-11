@@ -44,7 +44,13 @@ export default function RootLayout() {
         <Stack.Screen name="booking" options={{ headerShown: false }} />
         <Stack.Screen name="complete" options={{ headerShown: false }} />
         <Stack.Screen name="fakecall" options={{ headerShown: false }} />
-        <Stack.Screen name="register" options={{ headerShown: false }} />
+        <Stack.Screen name="report1" options={{ headerShown: false }} />
+        <Stack.Screen name="report2" options={{ headerShown: false }} />
+        <Stack.Screen name="report3" options={{ headerShown: false }} />
+        <Stack.Screen name="report4" options={{ headerShown: false }} />
+        <Stack.Screen name="report5" options={{ headerShown: false }} />
+        <Stack.Screen name="report6" options={{ headerShown: false }} />
+
 
 
       </Stack>
